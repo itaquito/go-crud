@@ -51,6 +51,23 @@ func deleteMovie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getMovie(w http.ResponseWriter, r *http.Request) {
+	// Define that we are going to return JSON
+	w.Header().Set("Content-Type", "application/json")
+
+	// Extract the params of the request
+	params := mux.Vars(r)
+
+	// Find the movie with ID
+	// In this case, we use _ since we won't be using the index
+	for _, item := range movies {
+		if item.ID == params["id"] {
+			json.NewEncoder(w).Encode(item)
+			return
+		}
+	}
+}
+
 func main() {
 	// Creates the MUX router
 	r := mux.NewRouter()
@@ -61,7 +78,7 @@ func main() {
 
 	// Define the routes
 	r.HandleFunc("/movies", getMovies).Methods("GET")
-	// r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
+	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	// r.HandleFunc("/movies", createMovie).Methods("POST")
 	// r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
 	r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
