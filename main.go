@@ -89,6 +89,37 @@ func createMovie(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(movies)
 }
 
+func updateMovie(w http.ResponseWriter, r *http.Request) {
+	// Define that we are going to return JSON
+	w.Header().Set("Content-Type", "application/json")
+
+	// Extract the params of the request
+	params := mux.Vars(r)
+
+	// Find the movie with ID
+	for index, item := range movies {
+		if item.ID == params["id"] {
+			// Delete a movie with append
+			movies = append(movies[:index], movies[index+1:]...)
+			break
+		}
+	}
+
+	// A variable of type movie
+	var movie Movie
+	// Decode the body and save it to the movie variable
+	_ = json.NewDecoder(r.Body).Decode(&movie)
+
+	// Create a random ID and covert it into a string
+	movie.ID = params["id"]
+
+	// Appends the new movie into our list
+	movies = append(movies, movie)
+
+	// Returns the list of movies
+	json.NewEncoder(w).Encode(movies)
+}
+
 func main() {
 	// Creates the MUX router
 	r := mux.NewRouter()
@@ -101,7 +132,7 @@ func main() {
 	r.HandleFunc("/movies", getMovies).Methods("GET")
 	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
 	r.HandleFunc("/movies", createMovie).Methods("POST")
-	// r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
+	r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
 	r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
 
 	fmt.Printf("Starting server at port 8000.\n")
