@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -68,6 +70,25 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createMovie(w http.ResponseWriter, r *http.Request) {
+	// Define that we are going to return JSON
+	w.Header().Set("Content-Type", "application/json")
+
+	// A variable of type movie
+	var movie Movie
+	// Decode the body and save it to the movie variable
+	_ = json.NewDecoder(r.Body).Decode(&movie)
+
+	// Create a random ID and covert it into a string
+	movie.ID = strconv.Itoa(rand.Intn(100))
+
+	// Appends the new movie into our list
+	movies = append(movies, movie)
+
+	// Returns the list of movies
+	json.NewEncoder(w).Encode(movies)
+}
+
 func main() {
 	// Creates the MUX router
 	r := mux.NewRouter()
@@ -79,7 +100,7 @@ func main() {
 	// Define the routes
 	r.HandleFunc("/movies", getMovies).Methods("GET")
 	r.HandleFunc("/movies/{id}", getMovie).Methods("GET")
-	// r.HandleFunc("/movies", createMovie).Methods("POST")
+	r.HandleFunc("/movies", createMovie).Methods("POST")
 	// r.HandleFunc("/movies/{id}", updateMovie).Methods("PUT")
 	r.HandleFunc("/movies/{id}", deleteMovie).Methods("DELETE")
 
