@@ -51,6 +51,9 @@ func deleteMovie(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+
+	// Returns the list of movies
+	json.NewEncoder(w).Encode(movies)
 }
 
 func getMovie(w http.ResponseWriter, r *http.Request) {
